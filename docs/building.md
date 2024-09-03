@@ -25,8 +25,8 @@ The official Docker image for Composer supports only PHP 8.  Build our own image
 ```bash
 pushd scratch
 git clone https://github.com/composer/docker.git composer-docker
-cd composer-docker/2.5
-sed -i .old 's/^FROM php:8-alpine/FROM php:7.3-alpine/' Dockerfile
+cd composer-docker/lts
+[ "$(uname)" = "Darwin" ] && sed -i .old 's/^FROM php:8-alpine/FROM php:7.3-alpine/' Dockerfile || sed -i'.old' 's/^FROM php:8-alpine/FROM php:7.3-alpine/' Dockerfile
 docker build -t composer:php7.3 .
 popd
 ```
