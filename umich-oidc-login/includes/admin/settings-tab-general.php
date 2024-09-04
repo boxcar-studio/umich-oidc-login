@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UMich OIDC settings page - General tab
  *
@@ -87,10 +88,20 @@ wp user update YOUR-WORDPRESS-USERNAME --user_pass="PUT-YOUR-NEW-PASSWORD-HERE"
 		'name'     => 'Who can access this site?',
 		'desc'     => 'Allow only members of these groups (plus administrators) to access this site. Which groups show up here is determined by the <a href="#oidc/available_groups">Groups for Authorization</a> setting.',
 		'type'     => 'multiselect',
-		'labels'   => array( 'placeholder' => 'Select one or more groups...' ),
+		'labels'   => array('placeholder' => 'Select one or more groups...'),
 		'options'  => $this->available_groups(),
 		'validate' => 'umichOidcSettings.validateRestrictSite',
 		'std'      => $option_defaults['restrict_site'],
+	),
+	array(
+		'id'       => 'restrict_types',
+		'name'     => 'Which post types can be restricted?',
+		'desc'     => 'Select the post types that can be restricted via the OIDC metabox on the post edit screen. Pages and Posts are enabled by default. This list may display post types that have been added via themes or plugins. You should only select Custom Post Types unique to your site that you would like to restrict access to.',
+		'type'     => 'multiselect',
+		'labels'   => array('placeholder' => 'Select one or more post types...'),
+		'options'  => $this->available_post_types(),
+		'validate' => 'umichOidcSettings.validateRestrictTypes',
+		'std'      => $option_defaults['restrict_types'],
 	),
 	array(
 		'id'      => 'session_length',
