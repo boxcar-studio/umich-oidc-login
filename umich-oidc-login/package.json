@@ -19,8 +19,6 @@
 	},
 	"main": "src/metabox/index.js",
 	"dependencies": {
-		"@wordpress/components": "^28.6.0",
-		"@wordpress/element": "^6.6.0",
 		"react-select": "^5.7.4"
 	},
 	"devDependencies": {
