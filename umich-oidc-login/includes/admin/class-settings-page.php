@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Admin dashboard settings page.
  *
@@ -11,7 +10,7 @@
 namespace UMich_OIDC_Login\Admin;
 
 // If this file is called directly, abort.
-if (! defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -22,8 +21,7 @@ use function UMich_OIDC_Login\Core\log_message;
  *
  * @package    UMich_OIDC_Login\Admin
  */
-class Settings_Page
-{
+class Settings_Page {
 
 	/**
 	 * Context for this WordPress request / this run of the plugin.
@@ -44,34 +42,33 @@ class Settings_Page
 	 *
 	 * @param object $ctx Context for this WordPress request / this run of the plugin.
 	 */
-	public function __construct($ctx)
-	{
+	public function __construct( $ctx ) {
 
 		$this->ctx = $ctx;
 
-		$this->panel = new \UMich_OIDC_Login\Admin\WP_React_OptionsKit\React_OptionsKit('umich_oidc');
-		$this->panel->set_page_title('UMich OIDC Login Settings');
+		$this->panel = new \UMich_OIDC_Login\Admin\WP_React_OptionsKit\React_OptionsKit( 'umich_oidc' );
+		$this->panel->set_page_title( 'UMich OIDC Login Settings' );
 
 		// Setup the options panel menu.
-		\add_filter('umich_oidc_menu', array($this, 'setup_menu'));
-		\add_filter('umich_oidc_notices', array($this, 'notices'));
-		\add_filter('umich_oidc_labels', array($this, 'labels'));
-		\add_filter('umich_oidc_save_options', array($this, 'save_options'));
+		\add_filter( 'umich_oidc_menu', array( $this, 'setup_menu' ) );
+		\add_filter( 'umich_oidc_notices', array( $this, 'notices' ) );
+		\add_filter( 'umich_oidc_labels', array( $this, 'labels' ) );
+		\add_filter( 'umich_oidc_save_options', array( $this, 'save_options' ) );
 
 		// Register settings tabs.
-		\add_filter('umich_oidc_settings_tabs', array($this, 'register_settings_tabs'));
-		\add_filter('umich_oidc_registered_settings_sections', array($this, 'register_settings_subsections'));
+		\add_filter( 'umich_oidc_settings_tabs', array( $this, 'register_settings_tabs' ) );
+		\add_filter( 'umich_oidc_registered_settings_sections', array( $this, 'register_settings_subsections' ) );
 
 		// Register settings fields for the options panel.
-		\add_filter('umich_oidc_registered_settings', array($this, 'register_settings'));
+		\add_filter( 'umich_oidc_registered_settings', array( $this, 'register_settings' ) );
 
-		\add_filter('umich_oidc_settings_sanitize_provider_url', array($this, 'sanitize_provider_url'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_scopes', array($this, 'sanitize_scopes'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_login_return_url', array($this, 'sanitize_url'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_logout_return_url', array($this, 'sanitize_url'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_available_groups', array($this, 'sanitize_available_groups'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_restrict_site', array($this, 'sanitize_group_choices'), 3, 10);
-		\add_filter('umich_oidc_settings_sanitize_available_types', array($this, 'sanitize_available_post_types'), 3, 10);
+		\add_filter( 'umich_oidc_settings_sanitize_provider_url', array( $this, 'sanitize_provider_url' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_scopes', array( $this, 'sanitize_scopes' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_login_return_url', array( $this, 'sanitize_url' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_logout_return_url', array( $this, 'sanitize_url' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_available_groups', array( $this, 'sanitize_available_groups' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_restrict_site', array( $this, 'sanitize_group_choices' ), 3, 10 );
+		\add_filter( 'umich_oidc_settings_sanitize_available_types', array( $this, 'sanitize_available_post_types' ), 3, 10 );
 
 		\wp_enqueue_script(
 			'umich-oidc-settings',
@@ -89,8 +86,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function setup_menu($menu)
-	{
+	public function setup_menu( $menu ) {
 		return array(
 			'parent'     => 'options-general.php',
 			'page_title' => 'UMich OIDC Login',
@@ -106,8 +102,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function notices($notices)
-	{
+	public function notices( $notices ) {
 		$notices = array();  // start over.
 
 		$options          = $this->ctx->options;
@@ -118,15 +113,15 @@ class Settings_Page
 			'client_id'     => 'Client ID',
 			'client_secret' => 'Client Secret',
 		);
-		foreach (\array_keys($required_options) as $opt) {
-			if (! \array_key_exists($opt, $options) || '' === $options[$opt]) {
-				$opt_name         = $required_options[$opt];
+		foreach ( \array_keys( $required_options ) as $opt ) {
+			if ( ! \array_key_exists( $opt, $options ) || '' === $options[ $opt ] ) {
+				$opt_name         = $required_options[ $opt ];
 				$missing_options .= "{$separator}<a href='#oidc/{$opt}'>{$opt_name}</a>";
 				$separator        = ', ';
 			}
 		}
 
-		if ('' !== $missing_options) {
+		if ( '' !== $missing_options ) {
 			$notices[] = array(
 				'id'      => 'missing-options',
 				'status'  => 'warning',
@@ -134,7 +129,7 @@ class Settings_Page
 			);
 		}
 
-		if (! \class_exists('Pantheon_Sessions')) {
+		if ( ! \class_exists( 'Pantheon_Sessions' ) ) {
 			$notices[] = array(
 				'id'      => 'pantheon-plugin',
 				'status'  => 'warning',
@@ -151,8 +146,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function labels($labels)
-	{
+	public function labels( $labels ) {
 
 		$labels['success'] = 'Settings successfully saved.  Clear any WordPress and web hosting caches to ensure new access restrictions fully take effect.';
 		return $labels;
@@ -165,8 +159,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function save_options($options)
-	{
+	public function save_options( $options ) {
 		$this->ctx->options = $options; // save the new data so the notices filter can use them.
 		return $options;
 	}
@@ -178,8 +171,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function register_settings_tabs($tabs)
-	{
+	public function register_settings_tabs( $tabs ) {
 		$tabs = array(
 			'general'    => 'General',
 			'oidc'       => 'OIDC',
@@ -195,8 +187,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function register_settings_subsections($sections)
-	{
+	public function register_settings_subsections( $sections ) {
 		return $sections;
 	}
 
@@ -207,18 +198,17 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function post_access_groups($id)
-	{
+	public function post_access_groups( $id ) {
 
-		$access = \get_post_meta($id, '_umich_oidc_access', true);
-		log_message("access list for post {$id}: \"{$access}\"");
+		$access = \get_post_meta( $id, '_umich_oidc_access', true );
+		log_message( "access list for post {$id}: \"{$access}\"" );
 
 		// If $access is empty, explode() will return an array with
 		// one element that is an empty string.
-		if ('' === $access) {
+		if ( '' === $access ) {
 			return array();
 		}
-		$access = \array_map('\trim', \explode(',', $access));
+		$access = \array_map( '\trim', \explode( ',', $access ) );
 
 		return $access;
 	}
@@ -228,8 +218,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function available_groups()
-	{
+	public function available_groups() {
 
 		$groups = array(
 			array(
@@ -243,12 +232,12 @@ class Settings_Page
 		);
 
 		$options = $this->ctx->options;
-		if (! \array_key_exists('available_groups', $options) || ! \is_string($options['available_groups'])) {
+		if ( ! \array_key_exists( 'available_groups', $options ) || ! \is_string( $options['available_groups'] ) ) {
 			return $groups;
 		}
-		$available = \array_map('\trim', \explode(',', $options['available_groups']));
-		foreach ($available as $a) {
-			if ('' !== $a) {
+		$available = \array_map( '\trim', \explode( ',', $options['available_groups'] ) );
+		foreach ( $available as $a ) {
+			if ( '' !== $a ) {
 				$groups[] = array(
 					'value' => $a,
 					'label' => $a,
@@ -264,11 +253,10 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function available_post_types()
-	{
+	public function available_post_types() {
 
-		$all_types = \get_post_types(array(), 'objects');
-		$exclude	 = array(
+		$all_types = \get_post_types( array(), 'objects' );
+		$exclude   = array(
 			'attachment',
 			'revision',
 			'nav_menu_item',
@@ -288,11 +276,11 @@ class Settings_Page
 			'acf-field',
 			'acf-post-type',
 			'acf-ui-options-page',
-			'umich_oidc_access'
+			'umich_oidc_access',
 		);
-		$types = array();
-		foreach ($all_types as $type) {
-			if (\in_array($type->name, $exclude, true)) {
+		$types     = array();
+		foreach ( $all_types as $type ) {
+			if ( \in_array( $type->name, $exclude, true ) ) {
 				continue;
 			}
 			$types[] = array(
@@ -300,16 +288,15 @@ class Settings_Page
 				'label' => $type->label,
 			);
 		}
-		log_message($types);
-
+		log_message( $types );
 
 		$options = $this->ctx->options;
-		if (! \array_key_exists('available_post_types', $options) || ! \is_string($options['available_post_types'])) {
+		if ( ! \array_key_exists( 'available_post_types', $options ) || ! \is_string( $options['available_post_types'] ) ) {
 			return $types;
 		}
-		$available = \array_map('\trim', \explode(',', $options['available_post_types']));
-		foreach ($available as $a) {
-			if ('' !== $a) {
+		$available = \array_map( '\trim', \explode( ',', $options['available_post_types'] ) );
+		foreach ( $available as $a ) {
+			if ( '' !== $a ) {
 				$types[] = array(
 					'value' => $a,
 					'label' => $a,
@@ -327,8 +314,7 @@ class Settings_Page
 	 *
 	 * @return array
 	 */
-	public function register_settings($settings)
-	{
+	public function register_settings( $settings ) {
 
 		$option_defaults = $this->ctx->option_defaults;
 
@@ -355,38 +341,37 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the URL field.
 	 * @return string
 	 */
-	public function sanitize_provider_url($input, $errors, $setting)
-	{
+	public function sanitize_provider_url( $input, $errors, $setting ) {
 
-		if (! \is_string($input)) {
-			$errors->add('provider_url', 'Internal error (not a string)');
+		if ( ! \is_string( $input ) ) {
+			$errors->add( 'provider_url', 'Internal error (not a string)' );
 			return '';
 		}
 
-		$input = \trim($input);
-		if ('' === $input) {
+		$input = \trim( $input );
+		if ( '' === $input ) {
 			// Allow people to save other settings before saving
 			// the provider URL.
 			return '';
 		}
-		$url = \esc_url_raw($input, array('https'));
-		if ('' === $url) {
-			$errors->add('provider_url', 'Must be a URL starting with https://');
+		$url = \esc_url_raw( $input, array( 'https' ) );
+		if ( '' === $url ) {
+			$errors->add( 'provider_url', 'Must be a URL starting with https://' );
 			return '';
 		}
-		$url     = \rtrim($url, '/');
-		$request = \wp_safe_remote_get($url . '/.well-known/openid-configuration');
-		if (\is_wp_error($request)) {
-			$msg = 'Does not appear to be an OpenID Identity Provider: unable to retrieve ' . \esc_url($url) . '/.well-known/openid-configuration';
-			$errors->add('provider_url', $msg);
-			log_message($msg);
-			log_message($request);
+		$url     = \rtrim( $url, '/' );
+		$request = \wp_safe_remote_get( $url . '/.well-known/openid-configuration' );
+		if ( \is_wp_error( $request ) ) {
+			$msg = 'Does not appear to be an OpenID Identity Provider: unable to retrieve ' . \esc_url( $url ) . '/.well-known/openid-configuration';
+			$errors->add( 'provider_url', $msg );
+			log_message( $msg );
+			log_message( $request );
 			return '';
 		}
-		$body = \wp_remote_retrieve_body($request);
-		$json = \json_decode($body);
-		if (JSON_ERROR_NONE !== \json_last_error()) {
-			$errors->add('provider_url', 'Does not appear to be an OpenID Identity Provider: ' . \esc_url($url) . '/.well-known/openid-configuration is not a valid JSON document.');
+		$body = \wp_remote_retrieve_body( $request );
+		$json = \json_decode( $body );
+		if ( JSON_ERROR_NONE !== \json_last_error() ) {
+			$errors->add( 'provider_url', 'Does not appear to be an OpenID Identity Provider: ' . \esc_url( $url ) . '/.well-known/openid-configuration is not a valid JSON document.' );
 			return '';
 		}
 		return $url;
@@ -400,21 +385,20 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the scopes field.
 	 * @return string
 	 */
-	public function sanitize_scopes($input, $errors, $setting)
-	{
+	public function sanitize_scopes( $input, $errors, $setting ) {
 
-		if (! \is_string($input)) {
-			$errors->add('scopes', 'Internal error (not a string)');
+		if ( ! \is_string( $input ) ) {
+			$errors->add( 'scopes', 'Internal error (not a string)' );
 			return '';
 		}
 
-		$input  = \trim($input);
-		$scopes = \explode(' ', $input);
+		$input  = \trim( $input );
+		$scopes = \explode( ' ', $input );
 
 		// The openid scope needs to be present
 		// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest .
-		if (! \in_array('openid', $scopes, true)) {
-			$errors->add('scopes', 'The scope "openid" is required.');
+		if ( ! \in_array( 'openid', $scopes, true ) ) {
+			$errors->add( 'scopes', 'The scope "openid" is required.' );
 			return '';
 		}
 
@@ -423,9 +407,9 @@ class Settings_Page
 		// which is any printable ASCII character except spaces,
 		// double quote, or backslash.
 		// https://www.rfc-editor.org/rfc/rfc6749.html#section-3.3 .
-		foreach ($scopes as $s) {
-			if (1 !== \preg_match('/^[\x21\x23-\x5b\x5d-\x7e]+$/', $s)) {
-				$errors->add('scopes', 'Bad character in scope name: \'' . $s . '\'');
+		foreach ( $scopes as $s ) {
+			if ( 1 !== \preg_match( '/^[\x21\x23-\x5b\x5d-\x7e]+$/', $s ) ) {
+				$errors->add( 'scopes', 'Bad character in scope name: \'' . $s . '\'' );
 				return '';
 			}
 		}
@@ -441,25 +425,24 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the available_groups field.
 	 * @return string
 	 */
-	public function sanitize_available_groups($input, $errors, $setting)
-	{
+	public function sanitize_available_groups( $input, $errors, $setting ) {
 
 		$field_id = $setting['id'];
 
-		if (! \is_string($input)) {
-			$errors->add($field_id, 'Internal error (not a string)');
+		if ( ! \is_string( $input ) ) {
+			$errors->add( $field_id, 'Internal error (not a string)' );
 			return '';
 		}
 
-		$input = \trim($input);
-		if ('' === $input) {
+		$input = \trim( $input );
+		if ( '' === $input ) {
 			return '';
 		}
 
 		// Single quotes are legal in group names, unescape them.
-		$input = str_replace("\\'", "'", $input);
+		$input = str_replace( "\\'", "'", $input );
 
-		log_message("available groups: |$input|");
+		log_message( "available groups: |$input|" );
 		return $input;
 	}
 
@@ -471,42 +454,41 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the groups field.
 	 * @return array
 	 */
-	public function sanitize_group_choices($input, $errors, $setting)
-	{
+	public function sanitize_group_choices( $input, $errors, $setting ) {
 
-		log_message('group choices: ');
-		log_message($input);
+		log_message( 'group choices: ' );
+		log_message( $input );
 		$field_id = $setting['id'];
-		if (! \is_array($input)) {
-			$errors->add($field_id, 'Internal error (not an array)');
+		if ( ! \is_array( $input ) ) {
+			$errors->add( $field_id, 'Internal error (not an array)' );
 			return array();
 		}
 
-		$n = \count($input);
-		if (0 === $n) {
-			$errors->add($field_id, 'Must select at least one group.');
+		$n = \count( $input );
+		if ( 0 === $n ) {
+			$errors->add( $field_id, 'Must select at least one group.' );
 			return array();
 		}
-		if ($n > 1) {
-			if (\in_array('_everyone_', $input, true)) {
-				$errors->add($field_id, '"( Everyone )" cannot be used together with other groups.');
+		if ( $n > 1 ) {
+			if ( \in_array( '_everyone_', $input, true ) ) {
+				$errors->add( $field_id, '"( Everyone )" cannot be used together with other groups.' );
 				return array();
 			}
-			if (\in_array('_logged_in_', $input, true)) {
-				$errors->add($field_id, '"( Logged-in Users )" cannot be used together with other groups.');
+			if ( \in_array( '_logged_in_', $input, true ) ) {
+				$errors->add( $field_id, '"( Logged-in Users )" cannot be used together with other groups.' );
 				return array();
 			}
 		}
 
 		$values = array_map(
-			function ($v) {
+			function ( $v ) {
 				return $v['value'];
 			},
 			$setting['options']
 		);
-		foreach ($input as $group) {
-			if (! \in_array($group, $values, true)) {
-				$errors->add($field_id, 'Unknown group: ' . esc_html($group));
+		foreach ( $input as $group ) {
+			if ( ! \in_array( $group, $values, true ) ) {
+				$errors->add( $field_id, 'Unknown group: ' . esc_html( $group ) );
 				return array();
 			}
 		}
@@ -522,22 +504,21 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the available_groups field.
 	 * @return string
 	 */
-	public function sanitize_available_post_types($input, $errors, $setting)
-	{
+	public function sanitize_available_post_types( $input, $errors, $setting ) {
 
 		$field_id = $setting['id'];
 
-		if (! \is_string($input)) {
-			$errors->add($field_id, 'Internal error (not a string)');
+		if ( ! \is_string( $input ) ) {
+			$errors->add( $field_id, 'Internal error (not a string)' );
 			return '';
 		}
 
-		$input = \trim($input);
-		if ('' === $input) {
+		$input = \trim( $input );
+		if ( '' === $input ) {
 			return '';
 		}
 
-		log_message("available post types: |$input|");
+		log_message( "available post types: |$input|" );
 		return $input;
 	}
 
@@ -549,24 +530,23 @@ class Settings_Page
 	 * @param array  $setting The wp-optionskit setting array for the URL field.
 	 * @return string
 	 */
-	public function sanitize_url($input, $errors, $setting)
-	{
+	public function sanitize_url( $input, $errors, $setting ) {
 
 		$field_id = $setting['id'];
 
-		if (! \is_string($input)) {
-			$errors->add($field_id, 'Internal error (not a string)');
+		if ( ! \is_string( $input ) ) {
+			$errors->add( $field_id, 'Internal error (not a string)' );
 			return '';
 		}
 
-		$input = \trim($input);
-		if ('' === $input) {
+		$input = \trim( $input );
+		if ( '' === $input ) {
 			return '';
 		}
 
-		$url = \esc_url_raw($input, array('https'));
-		if ('' === $url) {
-			$errors->add($field_id, 'Must be a URL starting with "https://" or "/"');
+		$url = \esc_url_raw( $input, array( 'https' ) );
+		if ( '' === $url ) {
+			$errors->add( $field_id, 'Must be a URL starting with "https://" or "/"' );
 			return '';
 		}
 		return $input;

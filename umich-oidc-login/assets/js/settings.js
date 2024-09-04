@@ -5,7 +5,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0.html GPLv3 or later
  */
 
-var umichOidcSettings = {
+var umichOidcSettings =  {
 
 	/** Check to see if the contents of the restrict_site form field are valid.
 	 *
@@ -13,15 +13,15 @@ var umichOidcSettings = {
 	 *     [ { value: 123, label: 'option 1' }, { value: 456, label: 'option 2' } ]
 	 * @return string empty string if values are OK, or an error message if they are invalid.
 	 */
-	validateRestrictSite: function (values) {
-		if (values.length === 0) {
+	validateRestrictSite: function ( values ) {
+		if ( values.length === 0 ) {
 			return 'Must have at least one group';
 		}
-		if (values.length > 1) {
-			if (values.find(({ value }) => value === '_everyone_')) {
+		if ( values.length > 1 )  {
+			if ( values.find(({ value }) => value === '_everyone_') ) {
 				return '"( Everyone )" cannot be used together with other groups.';
 			}
-			if (values.find(({ value }) => value === '_logged_in_')) {
+			if ( values.find(({ value }) => value === '_logged_in_') ) {
 				return '"( Logged-in Users )" cannot be used together with other groups.';
 			}
 		}
@@ -34,8 +34,8 @@ var umichOidcSettings = {
  *     [ { value: 123, label: 'option 1' }, { value: 456, label: 'option 2' } ]
  * @return string empty string if values are OK, or an error message if they are invalid.
  */
-	validateRestrictTypes: function (values) {
-		if (values.length === 0) {
+	validateRestrictTypes: function ( values ) {
+		if ( values.length === 0 ) {
 			return 'Leaving the "Posts" and "Pages" options selected is recommended.';
 		}
 		return '';
